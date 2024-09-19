@@ -16,6 +16,7 @@ DIGIT_ZERO = [1, 2, 4, 8, 9, 6]
 
 DIGITS = [DIGIT_ZERO, DIGIT_ONE, DIGIT_TWO, DIGIT_THREE, DIGIT_FOUR, DIGIT_FIVE, DIGIT_SIX, DIGIT_SEVEN, DIGIT_EIGHT, DIGIT_NINE]
 
+SIZE_DF = 300
 
 def make_dataset(n):
     dataset = []  # [int Digit, list Represent]
@@ -50,13 +51,13 @@ def train_epoch(dataset, weights_start, tetta):
     if count_error == 0:
         accuracy = 1
     else:
-        accuracy = 1 - (count_error / 300)
+        accuracy = 1 - (count_error / SIZE_DF)
 
     return weights, accuracy
 
 
 if __name__ == "__main__":
-    dataset = make_dataset(300)
+    dataset = make_dataset(SIZE_DF)
     weights = WEIGHTS_START
 
     for i in range(12):

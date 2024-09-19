@@ -1,6 +1,7 @@
 import copy
+import matplotlib.pyplot as plt
 from random import shuffle
-import artifical_neuron as art
+import artificial_neuron as art
 
 
 def add_noise(dataset, n):
@@ -23,7 +24,7 @@ if __name__ == "__main__":
 
     dataset = art.make_dataset(300)
 
-    num_of_noise = [i for i in range(0, 10)]  # 1..9
+    num_of_noise = [i for i in range(0, 10)]  # 0..9
     inaccuracy = []
 
     for i in num_of_noise:
@@ -41,5 +42,13 @@ if __name__ == "__main__":
                 break
 
         inaccuracy.append((1 - max(accuracy, cur_accuracy)) * 100)
+
+    plt.plot(num_of_noise, inaccuracy, '.-')
+    plt.xlabel('Number of noise')
+    plt.ylabel('Inaccuracy, %')
+
+    plt.title('Artificial neuron with noise')
+
+    plt.show()
 
     print(f'{[round(el, 2) for el in inaccuracy]}')
