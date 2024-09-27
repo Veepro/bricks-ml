@@ -61,8 +61,19 @@ if __name__ == "__main__":
     weights = WEIGHTS_START
 
     for i in range(12):
-        cur_weight, cur_accuracy = train_epoch(dataset, weights, TETTA)
+        cur_weights, cur_accuracy = train_epoch(dataset, weights, TETTA)
         if cur_accuracy == 1:
             break
 
-    print(f'Vector of weights: {cur_weight}')
+    print("Check!")
+    D = []
+    for i in range(0, 10):
+        D.append([i, [int(d + 1 in DIGITS[i]) for d in range(9)]])
+
+    for el in D:
+        summ = 0
+        for i in range(0, 9):
+            summ += el[1][i] * cur_weights[i]
+        print(f'{el[0]} sum: {summ}')
+
+    print(f'Vector of weights: {cur_weights}')
