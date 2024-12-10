@@ -1,8 +1,12 @@
+import random
+import copy
+import matplotlib.pyplot as plt
+
 from artificial_neuron import make_dataset, DIGITS
 from interference import add_noise
 
-WEIGHTS_MATRIX_START = [[2 for i in range(9)] for j in range(10)]
-SIZE_DF = 300
+WEIGHTS_MATRIX_START = [[random.randrange(1, 10) for i in range(9)] for j in range(10)]
+SIZE_DF = 1500
 
 representation_digits = []
 for d in DIGITS:
@@ -10,67 +14,50 @@ for d in DIGITS:
 
 
 def get_max(weights, num):
-    column_sum = []  # format: [(digit, summ)]
-    c = 0
-    for el in weights:
-        summ = 0
-        for i in range(9):
-            summ += el[i] * num[1][i]
+    summator = []
+    for i in range(10):
+        summator.append((i, sum([weights[i][j] * num[1][j] for j in range(9)])))
 
-        column_sum.append((c, summ))
-        c += 1
-
-    column_sum = sorted(column_sum, key=lambda x: x[1], reverse=True)
-    maximum = []
-    prev = column_sum[0][1]
-    for el in column_sum:
-        if el[1] == prev:
-            maximum.append(el[0])
-        else:
-            break
-
-    return maximum
+    return sorted(summator, key=lambda x: x[1], reverse=True)[0][0]
 
 
 def train_epoch(dataset, weights_start):
-    weights = weights_start
-    count_error = 0
+    weights = copy.deepcopy(weights_start)
+    c = 0
     for el in dataset:
-        maximim = get_max(weights, el)
-        if len(maximim) == 1 and maximim[0] == el[0]:
-            pass
+        m = get_max(weights, el)
+        if m != el[0]:
+            c += 1
+            weights[el[0]] = [weights[el[0]][j] + el[1][j] for j in range(9)]
 
-        else:
-            count_error += 1
+            weights[m] = [weights[m][j] - el[1][j] for j in range(9)]
 
-            for i in range(9):
-                weights[el[0]][i] += el[1][i]
-
-            if el[0] in maximim:
-                maximim.remove(el[0])
-
-            for m in maximim:
-                for i in range(9):
-                    weights[m][i] -= representation_digits[m][i]
-
-    if count_error == 0:
-        accuracy = 1
-    else:
-        accuracy = 1 - (count_error / SIZE_DF)
-
-    return weights, accuracy, count_error
+    accuracy = 1 - (c / len(dataset))
+    return weights, accuracy
 
 
 if __name__ == "__main__":
-    ds = make_dataset(SIZE_DF)
-    cur_weights = WEIGHTS_MATRIX_START
-    print(cur_weights)
-    for i in range(15):
-        cur_weights, cur_accuracy, c = train_epoch(ds, cur_weights)
-        print(cur_accuracy * 100, c)
-        if cur_accuracy == 1:
-            print("Success!")
-            break
+    dataset = make_dataset(SIZE_DF)
+    weights = copy.deepcopy(WEIGHTS_MATRIX_START)
 
-    print("after train:")
-    print(cur_weights)
+    num_of_noise = [i for i in range(0, 10)]  # 0..9
+    inaccuracy = []
+
+    for i in num_of_noise:
+        ds_with_noise = add_noise(dataset, i)
+        accuracy = -1
+        cur_accuracy = 0
+        cur_weights = copy.deepcopy(weights)
+        c = 0
+        while cur_accuracy > accuracy:
+            c += 1
+            accuracy = cur_accuracy
+            weights = cur_weights
+            cur_weights, cur_accuracy = train_epoch(ds_with_noise, weights)
+
+            if c > 15:
+                break
+
+        inaccuracy.append((1 - max(accuracy, cur_accuracy)) * 100)
+
+    print(inaccuracy)
