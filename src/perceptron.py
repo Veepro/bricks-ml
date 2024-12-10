@@ -14,6 +14,7 @@ for d in DIGITS:
 
 
 def get_max(weights, num):
+    # This func can be used for recognition by a prepared matrix
     summator = []
     for i in range(10):
         summator.append((i, sum([weights[i][j] * num[1][j] for j in range(9)])))
@@ -40,7 +41,7 @@ if __name__ == "__main__":
     dataset = make_dataset(SIZE_DF)
     weights = copy.deepcopy(WEIGHTS_MATRIX_START)
 
-    num_of_noise = [i for i in range(0, 10)]  # 0..9
+    num_of_noise = [i for i in range(0, 10)]  # 0...9
     inaccuracy = []
 
     for i in num_of_noise:
@@ -60,4 +61,12 @@ if __name__ == "__main__":
 
         inaccuracy.append((1 - max(accuracy, cur_accuracy)) * 100)
 
-    print(inaccuracy)
+    plt.plot(num_of_noise, inaccuracy, '.-')
+    plt.xlabel('Number of noise')
+    plt.ylabel('Probability of error, %')
+
+    plt.title('Perceptron with noise')
+
+    plt.show()
+
+    print(f'{[round(el, 2) for el in inaccuracy]}')
